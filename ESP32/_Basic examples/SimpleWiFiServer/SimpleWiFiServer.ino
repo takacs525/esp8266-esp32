@@ -2,45 +2,31 @@
  WiFi Web Server LED Blink
 
  A simple web server that lets you blink an LED via the web.
- This sketch will print the IP address of your WiFi Shield (once connected)
- to the Serial monitor. From there, you can open that address in a web browser
- to turn on and off the LED on pin 5.
+ From there, you can open that address in a web browser to turn on and off the integrated LED on pin 2.
 
  If the IP address of your shield is yourAddress:
  http://yourAddress/H turns the LED on
  http://yourAddress/L turns it off
-
- This example is written for a network using WPA encryption. For
- WEP or WPA, change the Wifi.begin() call accordingly.
-
- Circuit:
- * WiFi shield attached
- * LED attached to pin 5
-
- created for arduino 25 Nov 2012
- by Tom Igoe
-
-ported for sparkfun esp32 
-31.01.2017 by Jan Hendrik Berlin
  
- */
+*/
+#include "WiFi.h"
 
-#include <WiFi.h>
-
-const char* ssid     = "ssid";
-const char* password = "password";
+const char* ssid     = "SSID";
+const char* password = "PASSWORD";
 
 WiFiServer server(80);
 
 void setup()
 {
     Serial.begin(115200);
-    pinMode(5, OUTPUT);      // set the LED pin mode
+    pinMode(2, OUTPUT);      // set the LED pin mode
 
     delay(10);
 
     // We start by connecting to a WiFi network
-
+    WiFi.mode(WIFI_STA);
+    WiFi.disconnect(); 
+    
     Serial.println();
     Serial.println();
     Serial.print("Connecting to ");
@@ -86,8 +72,8 @@ void loop(){
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> to turn the LED on pin 5 on.<br>");
-            client.print("Click <a href=\"/L\">here</a> to turn the LED on pin 5 off.<br>");
+            client.print("Click <a href=\"/H\">here</a> to turn the LED on.<br>");
+            client.print("Click <a href=\"/L\">here</a> to turn the LED off.<br>");
 
             // The HTTP response ends with another blank line:
             client.println();
@@ -102,10 +88,10 @@ void loop(){
 
         // Check to see if the client request was "GET /H" or "GET /L":
         if (currentLine.endsWith("GET /H")) {
-          digitalWrite(5, HIGH);               // GET /H turns the LED on
+          digitalWrite(2, HIGH);               // GET /H turns the LED on
         }
         if (currentLine.endsWith("GET /L")) {
-          digitalWrite(5, LOW);                // GET /L turns the LED off
+          digitalWrite(2, LOW);                // GET /L turns the LED off
         }
       }
     }
