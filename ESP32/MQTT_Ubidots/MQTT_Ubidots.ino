@@ -14,6 +14,9 @@ char mqttBroker[]  = "things.ubidots.com";
 char payload[255];
 char topic[150];
 
+unsigned long previousMillis = 0;
+const long interval = 10000;
+
 /****************************************
  * Auxiliar Functions
  ****************************************/
@@ -57,18 +60,22 @@ void setup() {
 }
 
 void loop() {
-  if (!client.connected()) {
+  if (!client.loop()) {
     reconnect();
   }
-
-  int chk = DHT.read22(DHT22_PIN);
-
-  if (chk == DHTLIB_OK) {
-    PublishData(DHT.temperature, DHT.humidity, 0);
-  } else {
-    Serial.println("DHT read error!!!");
-    PublishData(0, 0, 1);
+  
+  unsigned long currentMillis = millis();   // get current "time"
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;         // save the last time you read the DHT sensor
+    
+    int chk = DHT.read22(DHT22_PIN);
+    if (chk == DHTLIB_OK) {
+      PublishData(DHT.temperature, DHT.humidity, 0);
+    } else {
+      Serial.println("DHT read error!!!");
+      PublishData(0, 0, 1);
+    }
   }
 
-  delay(5000);
+  delay(500);  
 }
